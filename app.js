@@ -6,6 +6,7 @@ const xss = require('xss-clean');
 const hpp = require('hpp');
 const rateLimit = require('express-rate-limit');
 const compression = require('compression');
+const fileUpload = require('express-fileupload');
 
 const errors = require('./constants/errors');
 const AppError = require('./utils/appError');
@@ -13,6 +14,7 @@ const logger = require('./utils/logger');
 const globalErrorHandler = require('./controllers/errorController');
 const authRouter = require('./routes/authRoutes');
 const movieRouter = require('./routes/movieRoutes');
+const models = require('./models');
 
 const app = express();
 
@@ -53,8 +55,22 @@ app.use((req, res, next) => {
   next();
 });
 
+app.use(fileUpload());
+
 app.use('/api/v1', authRouter);
 app.use('/api/v1/movies', movieRouter);
+
+app.get('/api/v1', async (req, res) => {
+  const users = await models.User.findAll();
+  const actors = await models.Actor.findAll();
+  const movies = await models.Movie.findAll();
+
+  res.status(200).json({
+    users,
+    actors,
+    movies
+  });
+});
 
 app.get('/live-check', (req, res) => {
   res.sendStatus(200);
@@ -67,24 +83,3 @@ app.all('*', (req, res, next) => {
 app.use(globalErrorHandler);
 
 module.exports = app;
-
-// const { User } = require('./models');
-
-// if no users create test user
-// (async () => {
-//   const users = await User.findAll();
-
-//   if (users.length) return;
-
-//   User.create({
-//     name: 'test',
-//     email: 'test@example.com',
-//     password: 'Pass1234'
-//   });
-// })();
-
-// app.get('/user', (req, res) => {
-//   User.findAll().then((data) => {
-//     res.status(200).json(data);
-//   });
-// });

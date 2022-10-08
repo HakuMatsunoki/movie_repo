@@ -3,7 +3,7 @@ const AppError = require('../utils/appError');
 const authService = require('../services/authService');
 const authValidator = require('../utils/validators/authValidator');
 const nameNormalizer = require('../utils/userNameHandler');
-const errors = require('../constants/errors');
+const errorMsg = require('../constants/errors');
 const joiErrorsHandler = require('../utils/joiErrorsHandler');
 
 /**
@@ -17,10 +17,10 @@ exports.checkNewUser = catchAsync(async (req, res, next) => {
 
   if (error) {
     const errToSend = joiErrorsHandler(error, {
-      name: errors.FAILED_USER_NAME,
-      email: errors.FAILED_USER_EMAIL,
-      password: errors.FAILED_USER_PASSWD,
-      confirmPassword: errors.FAILED_USER_PASSWD_DIFF
+      name: errorMsg.FAILED_USER_NAME,
+      email: errorMsg.FAILED_USER_EMAIL,
+      password: errorMsg.FAILED_USER_PASSWD,
+      confirmPassword: errorMsg.FAILED_USER_PASSWD_DIFF
     });
 
     return next(errToSend);
@@ -28,7 +28,7 @@ exports.checkNewUser = catchAsync(async (req, res, next) => {
 
   const userExists = await authService.checkUserByEmail(value.email);
 
-  if (userExists) return next(new AppError(errors.FAILED_USER_EXISTS));
+  if (userExists) return next(new AppError(errorMsg.FAILED_USER_EXISTS));
 
   req.userData = {
     name: nameNormalizer(value.name),
@@ -49,7 +49,7 @@ exports.checkUserCreds = catchAsync(async (req, res, next) => {
   const { value, error } = authValidator.checkUserCreds(req.body);
 
   if (error) {
-    const errToSend = joiErrorsHandler(error, { primary: errors.FAILED_AUTH });
+    const errToSend = joiErrorsHandler(error, { primary: errorMsg.FAILED_AUTH });
 
     return next(errToSend);
   }
@@ -71,12 +71,12 @@ exports.protect = catchAsync(async (req, res, next) => {
       ? req.headers.authorization.split(' ')[1]
       : false;
 
-  if (!token) return next(new AppError(errors.NO_LOGIN));
+  if (!token) return next(new AppError(errorMsg.NO_LOGIN));
 
   const { id } = await authService.verifyToken(token);
   const currentUser = await authService.getUserById(id);
 
-  if (!currentUser) return next(new AppError(errors.NO_LOGIN));
+  if (!currentUser) return next(new AppError(errorMsg.NO_LOGIN));
 
   req.user = currentUser;
 

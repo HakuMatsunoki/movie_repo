@@ -1,10 +1,10 @@
 const Joi = require('joi');
 
-const { POS_WHOLE_NUM } = require('../../constants/regexp');
+const { POS_WHOLE_NUM_REGEX } = require('../../constants/regexp');
 
-exports.checkIsNumber = (data) =>
+exports.checkIdIsNumber = (data) =>
   Joi.object({
-    num: Joi.string().regex(POS_WHOLE_NUM).required()
+    id: Joi.string().regex(POS_WHOLE_NUM_REGEX).required()
   })
     .unknown()
     .validate(data);
