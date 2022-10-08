@@ -40,15 +40,16 @@ exports.getAllMovies = async (id) => {
 /**
  * Create movie.
  * @param {Object} movieData
+ * @param {boolean} noActors
  * @returns {Promise<Object>}
  */
-const createMovie = async (movieData) => {
+const createMovie = async (movieData, noActors = false) => {
   const { user, actors: actorsNamesArr, ...restMovieData } = movieData;
 
   const newMovie = await universalRepository.createOne('Movie', restMovieData);
   const [actors] = await Promise.all([addActorsHelper(actorsNamesArr, newMovie.id), user.addMovie(newMovie)]);
 
-  return { ...newMovie.dataValues, actors };
+  return noActors ? newMovie.dataValues : { ...newMovie.dataValues, actors };
 };
 exports.createMovie = createMovie;
 
@@ -130,7 +131,7 @@ exports.loadFromFile = async (file, user) => {
   const moviesPromise = moviesData.map((movieData) => {
     const { actors, ...restMovieData } = movieData;
 
-    return createMovie({ user, actors, ...restMovieData });
+    return createMovie({ user, actors, ...restMovieData }, true);
   });
 
   const data = await Promise.all(moviesPromise);
