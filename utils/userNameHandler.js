@@ -1,7 +1,7 @@
 /**
- * User names normalizer
+ * User names normalizer.
  * @param {string} name
- * @returns
+ * @returns {string}
  */
 module.exports = (name) => {
   if (typeof name !== 'string') return '';

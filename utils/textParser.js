@@ -1,3 +1,8 @@
+/**
+ * Text file parser. Creates object of movies from loaded file.
+ * @param {Object} file
+ * @returns {Array}
+ */
 module.exports = (file) => {
   const convertedString = file.data
     .toString()

@@ -60,6 +60,7 @@ app.use(fileUpload());
 app.use('/api/v1', authRouter);
 app.use('/api/v1/movies', movieRouter);
 
+// test controller
 app.get('/api/v1', async (req, res) => {
   const users = await models.User.findAll();
   const actors = await models.Actor.findAll();

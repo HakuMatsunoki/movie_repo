@@ -5,7 +5,6 @@ const AppError = require('../utils/appError');
 const logger = require('../utils/logger');
 const errorMsg = require('../constants/errors');
 const userRepository = require('../repositories/userRepository');
-// const universalRepository = require('../universalRepository');
 
 /**
  * Generate new JWT token.

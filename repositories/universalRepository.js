@@ -1,5 +1,5 @@
 const models = require('../models');
-const APIFeatures = require('../utils/apiFeatures');
+// const APIFeatures = require('../utils/apiFeatures');
 
 /**
  * Create document.
@@ -21,7 +21,7 @@ exports.getAll = (model, query) => models[model].findAll(query);
  * Get document by id.
  * @param {string} model
  * @param {strimg} id
- * @param {string} query
+ * @param {Object} query
  * @returns {Promise<Object>}
  */
 exports.getOne = (model, id, query) => models[model].findByPk(id, query);
@@ -48,3 +48,11 @@ exports.deleteOne = (model, query) => models[model].destroy(query);
  * @param {Object} query
  */
 exports.deleteMany = (model, query) => models[model].destroy(query);
+
+/**
+ * Count documents.
+ * @param {string} model
+ * @param {Object} query
+ * @returns {Promise<number>}
+ */
+exports.count = (model, query) => models[model].count(query);

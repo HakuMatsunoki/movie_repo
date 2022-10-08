@@ -8,6 +8,9 @@ const logzioWinstonTransport = new LogzioWinstonTransport({
   host: process.env.LOGZIO_HOST
 });
 
+/**
+ * Winston logger function.
+ */
 module.exports = winston.createLogger({
   format: winston.format.combine(winston.format.colorize(), winston.format.simple()),
   transports: process.env.NODE_ENV === 'production' ? [logzioWinstonTransport] : [new winston.transports.Console()]

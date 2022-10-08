@@ -2,6 +2,11 @@ const catchAsync = require('../utils/catchAsync');
 const { OK } = require('../constants/statuses');
 const movieService = require('../services/movieService');
 
+/**
+ * Get all movies list.
+ * @method GET
+ * @param {Function} RequestHandler
+ */
 exports.getAllMovies = catchAsync(async (req, res) => {
   const userId = req.user.id;
 
@@ -14,6 +19,11 @@ exports.getAllMovies = catchAsync(async (req, res) => {
   });
 });
 
+/**
+ * Create new movie.
+ * @method POST
+ * @param {Function} RequestHandler
+ */
 exports.createMovie = catchAsync(async (req, res) => {
   const movieData = { user: req.user, ...req.movieData };
 
@@ -25,6 +35,11 @@ exports.createMovie = catchAsync(async (req, res) => {
   });
 });
 
+/**
+ * Edit movie.
+ * @method PATCH
+ * @param {Function} RequestHandler
+ */
 exports.editMovie = catchAsync(async (req, res) => {
   const { id } = req.params;
   const { movieData } = req;
@@ -37,6 +52,11 @@ exports.editMovie = catchAsync(async (req, res) => {
   });
 });
 
+/**
+ * Get movie by id.
+ * @method GET
+ * @param {Function} RequestHandler
+ */
 exports.getMovie = catchAsync(async (req, res) => {
   const { id } = req.params;
 
@@ -48,6 +68,11 @@ exports.getMovie = catchAsync(async (req, res) => {
   });
 });
 
+/**
+ * Delete movie by id.
+ * @method DELETE
+ * @param {Function} RequestHandler
+ */
 exports.deleteMovie = catchAsync(async (req, res) => {
   const { id } = req.params;
 
@@ -58,13 +83,19 @@ exports.deleteMovie = catchAsync(async (req, res) => {
   });
 });
 
+/**
+ * Upload text movies list.
+ * @method POST
+ * @param {Function} RequestHandler
+ */
 exports.uploadTxt = catchAsync(async (req, res) => {
   const { file } = req.files;
 
-  const movies = await movieService.loadFromFile(file);
+  const { data, meta } = await movieService.loadFromFile(file, req.user);
 
   res.status(200).json({
     status: OK,
-    data: movies
+    data,
+    meta
   });
 });

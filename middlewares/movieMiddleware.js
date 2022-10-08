@@ -6,6 +6,12 @@ const movieValidator = require('../utils/validators/movieValidator');
 const movieService = require('../services/movieService');
 const AppError = require('../utils/appError');
 
+/**
+ * Validate movie id and movie owner.
+ * @param {Object} req
+ * @param {Object} res
+ * @param {Function} next
+ */
 exports.checkMovieIdAndOwner = catchAsync(async (req, res, next) => {
   const { value, error } = universalValidator.checkIdIsNumber(req.params);
 
@@ -22,6 +28,12 @@ exports.checkMovieIdAndOwner = catchAsync(async (req, res, next) => {
   next();
 });
 
+/**
+ * Validate movie data.
+ * @param {Object} req
+ * @param {Object} res
+ * @param {Function} next
+ */
 exports.checkMovieData = (req, res, next) => {
   const { value, error } = movieValidator.checkMovieData(req.body);
 
