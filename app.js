@@ -62,13 +62,15 @@ app.use('/api/v1/movies', movieRouter);
 
 // test controller
 app.get('/api/v1', async (req, res) => {
+  const { Op } = require('sequelize');
+  const { Actor } = require('./models');
+
   const users = await models.User.findAll();
-  const actors = await models.Actor.findAll();
   const movies = await models.Movie.findAll();
 
   res.status(200).json({
+    total: movies.length,
     users,
-    actors,
     movies
   });
 });

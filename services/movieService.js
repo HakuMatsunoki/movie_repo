@@ -3,6 +3,7 @@ const models = require('../models');
 const AppError = require('../utils/appError');
 const textParser = require('../utils/textParser');
 const errorMsg = require('../constants/errors');
+const APIFeatures = require('../utils/apiFeatures');
 
 /**
  * Add actors to DB helper function.
@@ -27,11 +28,18 @@ const addActorsHelper = async (actorsNamesArr, movieId) => {
 /**
  * Get all movies belong to current user.
  * @param {number} id
+ * @param {Object} query
  * @returns {Promise<Array>}
  */
-exports.getAllMovies = async (id) => {
+exports.getAllMovies = async (id, query) => {
+  const features = new APIFeatures(query)
+    .search()
+    // .sort()
+    // .paginate()
+    .build();
+
   const user = await universalRepository.getOne('User', id, {
-    include: [{ model: models.Movie, attributes: { exclude: ['userId'] } }]
+    include: [{ model: models.Movie, attributes: { exclude: ['userId'] }, ...features }]
   });
 
   return user.dataValues.Movies;

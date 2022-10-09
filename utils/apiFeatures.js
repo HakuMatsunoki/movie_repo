@@ -1,36 +1,82 @@
-const { MONGO_QUERY_REGEX } = require('../constants/regexp');
+const { Op } = require('sequelize');
+
+const models = require('../models');
 
 /**
  * Class to implement sort, filter, paginate API features.
  */
 class APIFeatures {
-  #query;
+  #dbQuery;
 
   #reqQueryObj;
 
   /**
    * Constructor.
-   * @param {Object} dbQuery
    * @param {Object} reqQueryObj
    */
-  constructor(dbQuery, reqQueryObj) {
-    this.#query = dbQuery;
+  constructor(reqQueryObj) {
+    this.#dbQuery = {};
     this.#reqQueryObj = reqQueryObj;
   }
 
   /**
-   * Filter functionality, using lte, gte, lt, gt.
+   * Search functionality.
    * @returns {Object}
    */
-  filter() {
-    const queryObj = { ...this.#reqQueryObj };
-    const excludedFields = ['page', 'sort', 'limit', 'fields'];
+  search() {
+    const queryObj = this.#reqQueryObj;
+    const allowedSearchFields = ['actor', 'title', 'search'];
 
-    excludedFields.forEach((item) => delete queryObj[item]);
+    allowedSearchFields.forEach((field, idx) => {
+      if (!queryObj[field]) return;
 
-    const queryString = JSON.stringify(queryObj).replace(MONGO_QUERY_REGEX, (match) => `$${match}`);
+      if (idx === 0) {
+        this.#dbQuery.include = [
+          {
+            model: models.Actor,
+            where: { name: { [Op.like]: `%${queryObj[field]}%` } },
+            attributes: []
+          }
+        ];
 
-    this.#query.find(JSON.parse(queryString));
+        return;
+      }
+
+      if (idx === 1) {
+        this.#dbQuery.where = { [field]: { [Op.like]: `%${queryObj[field]}%` } };
+
+        return;
+      }
+
+      if (idx === 2) {
+        // this.#dbQuery.include = [
+        //   {
+        //     model: models.Actor,
+        //     where: {
+        //       [Op.or]: [
+        //         { name: { [Op.like]: `%${queryObj[field]}%` } },
+        //         { '$Movies.title$': { [Op.like]: `%${queryObj[field]}%` } }
+        //       ]
+        //     },
+        //     attributes: []
+        //   }
+        // ];
+
+        this.#dbQuery = {
+          include: [
+            {
+              model: models.Actor,
+              where: { name: { [Op.like]: `%${queryObj[field]}%` } },
+              // attributes: []
+              include: {
+                model: models.Movie
+              }
+            }
+          ],
+          // where: { [allowedSearchFields[1]]: { [Op.like]: `%${queryObj[field]}%` } }
+        };
+      }
+    });
 
     return this;
   }
@@ -40,28 +86,23 @@ class APIFeatures {
    * @returns {Object}
    */
   sort() {
-    const sortBy = this.#reqQueryObj.sort;
+    const { sort, order } = this.#reqQueryObj;
 
-    this.#query = sortBy ? this.#query.sort(sortBy.split(',').join(' ')) : this.#query.sort('-createdAt');
+    const allowedSortFieldsMap = {
+      id: true,
+      title: true,
+      year: true
+    };
 
-    return this;
-  }
+    const allowedOrderFieldsMap = {
+      ASC: true,
+      DESC: true
+    };
 
-  /**
-   * Set fields to show.
-   * @returns {Object}
-   */
-  limitFields() {
-    const { fields } = this.#reqQueryObj;
+    const sortBy = allowedSortFieldsMap[sort] ? sort : 'id';
+    const sortOrder = allowedOrderFieldsMap[order] ? order : 'ASC';
 
-    if (!fields) {
-      this.#query = this.#query.select('-__v');
-
-      return this;
-    }
-
-    const fieldsArr = fields.split(',').filter((item) => item !== 'hidden');
-    this.#query = this.#query.select(fieldsArr.join(' '));
+    this.#dbQuery.order = [[sortBy, sortOrder]];
 
     return this;
   }
@@ -71,21 +112,18 @@ class APIFeatures {
    * @returns {Object}
    */
   paginate() {
-    const page = +this.#reqQueryObj.page || 1;
-    const limit = +this.#reqQueryObj.limit || 10;
-    const skip = (page - 1) * limit;
-
-    this.#query = this.#query.skip(skip).limit(limit);
+    this.#dbQuery.limit = +this.#reqQueryObj.limit || 20;
+    this.#dbQuery.offset = +this.#reqQueryObj.offset || 0;
 
     return this;
   }
 
   /**
-   * Launch mongo query.
+   * Get query.
    * @returns {Object}
    */
-  launch() {
-    return this.#query;
+  build() {
+    return this.#dbQuery;
   }
 }
 

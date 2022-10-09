@@ -10,7 +10,7 @@ const movieService = require('../services/movieService');
 exports.getAllMovies = catchAsync(async (req, res) => {
   const userId = req.user.id;
 
-  const movies = await movieService.getAllMovies(userId);
+  const movies = await movieService.getAllMovies(userId, req.query);
 
   res.status(200).json({
     status: OK,
