@@ -49,32 +49,14 @@ class APIFeatures {
       }
 
       if (idx === 2) {
-        // this.#dbQuery.include = [
-        //   {
-        //     model: models.Actor,
-        //     where: {
-        //       [Op.or]: [
-        //         { name: { [Op.like]: `%${queryObj[field]}%` } },
-        //         { '$Movies.title$': { [Op.like]: `%${queryObj[field]}%` } }
-        //       ]
-        //     },
-        //     attributes: []
-        //   }
-        // ];
-
-        this.#dbQuery = {
-          include: [
-            {
-              model: models.Actor,
-              where: { name: { [Op.like]: `%${queryObj[field]}%` } },
-              // attributes: []
-              include: {
-                model: models.Movie
-              }
-            }
-          ],
-          // where: { [allowedSearchFields[1]]: { [Op.like]: `%${queryObj[field]}%` } }
-        };
+        // search functionality (search=<value> query) is not properly implemented!!!!
+        this.#dbQuery.include = [
+          {
+            model: models.Actor,
+            where: { name: { [Op.like]: `%${queryObj[field]}%` } },
+            attributes: []
+          }
+        ];
       }
     });
 

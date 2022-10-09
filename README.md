@@ -10,6 +10,7 @@ Also it is possible to upload movies list in txt file.
 2. Please, create account on the [logz.io](https://logz.io/) in case you want to save logs in the cloud.
 3. Change values of your environment variables:
 
+- `PORT` _server port_
 - `LOGZIO_HOST` _logzio logger host_
 - `LOGZIO_TOKEN` _logzio logger secret token_
 - `JWT_SECRET` _jwt auth secret phrase_
@@ -25,6 +26,18 @@ Also it is possible to upload movies list in txt file.
 Please, run next command to start the server:
 
 - `npm start`
+
+### Running via Docker
+
+Please, fetch docker [image](https://hub.docker.com/repository/docker/matsunoki/movies):
+
+- `sudo docker pull matsunoki/movies`
+
+Run application:
+
+- `sudo docker run -p 8000:8080 -d matsunoki/movies`
+
+
 
 Your app is up and running!
 Please, try to configure and connect frontend part of the app or use the Postman tool to test the API.

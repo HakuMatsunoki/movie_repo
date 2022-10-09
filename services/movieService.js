@@ -32,11 +32,7 @@ const addActorsHelper = async (actorsNamesArr, movieId) => {
  * @returns {Promise<Array>}
  */
 exports.getAllMovies = async (id, query) => {
-  const features = new APIFeatures(query)
-    .search()
-    // .sort()
-    // .paginate()
-    .build();
+  const features = new APIFeatures(query).search().sort().paginate().build();
 
   const user = await universalRepository.getOne('User', id, {
     include: [{ model: models.Movie, attributes: { exclude: ['userId'] }, ...features }]

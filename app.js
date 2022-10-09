@@ -14,7 +14,6 @@ const logger = require('./utils/logger');
 const globalErrorHandler = require('./controllers/errorController');
 const authRouter = require('./routes/authRoutes');
 const movieRouter = require('./routes/movieRoutes');
-const models = require('./models');
 
 const app = express();
 
@@ -38,12 +37,6 @@ app.use(express.urlencoded({ extended: true, limit: '10kb' }));
 
 app.use(xss());
 app.use(hpp());
-// app.use(
-//   hpp({
-//     whitelist: ['duration', 'difficulty', 'price']
-//   })
-// );
-
 app.use(compression());
 
 app.use((req, res, next) => {
@@ -59,21 +52,6 @@ app.use(fileUpload());
 
 app.use('/api/v1', authRouter);
 app.use('/api/v1/movies', movieRouter);
-
-// test controller
-app.get('/api/v1', async (req, res) => {
-  const { Op } = require('sequelize');
-  const { Actor } = require('./models');
-
-  const users = await models.User.findAll();
-  const movies = await models.Movie.findAll();
-
-  res.status(200).json({
-    total: movies.length,
-    users,
-    movies
-  });
-});
 
 app.get('/live-check', (req, res) => {
   res.sendStatus(200);
