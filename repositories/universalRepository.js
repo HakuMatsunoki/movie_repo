@@ -38,6 +38,7 @@ exports.updateOne = (model, id, data) => models[model].update({ ...data }, { whe
  * Delete document by id.
  * @param {string} model
  * @param {Object} query
+ * @returns {Promise<void>}
  */
 exports.deleteOne = (model, query) => models[model].destroy(query);
 
@@ -45,6 +46,7 @@ exports.deleteOne = (model, query) => models[model].destroy(query);
  * Delete many documents.
  * @param {string} model
  * @param {Object} query
+ * @returns {Promise<void>}
  */
 exports.deleteMany = (model, query) => models[model].destroy(query);
 

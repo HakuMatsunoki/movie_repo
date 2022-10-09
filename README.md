@@ -38,7 +38,6 @@ Run application:
 - `sudo docker run -p 8000:8080 -d matsunoki/movies`
 
 
-
 Your app is up and running!
 Please, try to configure and connect frontend part of the app or use the Postman tool to test the API.
 Endpoints documentation available [here](https://documenter.getpostman.com/view/356840/TzkyLeVK#0839c3b0-b2e9-45d2-8868-7685c29995fc)..
