@@ -26,6 +26,18 @@ const addActorsHelper = async (actorsNamesArr, movieId) => {
 };
 
 /**
+ * Check if movie title already exists.
+ * @param {string} title
+ * @returns {Promise<boolean>}
+ */
+const isTitleExists = async (title, userId) => {
+  const movie = await universalRepository.count('Movie', { where: { title, userId } });
+
+  return !!movie;
+};
+exports.isTitleExists = isTitleExists;
+
+/**
  * Get all movies belong to current user.
  * @param {number} id
  * @param {Object} query
@@ -45,10 +57,16 @@ exports.getAllMovies = async (id, query) => {
  * Create movie.
  * @param {Object} movieData
  * @param {boolean} noActors
- * @returns {Promise<Object>}
+ * @returns {Promise<Object | void>}
  */
-const createMovie = async (movieData, noActors = false) => {
+const createMovie = async (movieData, noActors = false, throwExistsError = true) => {
   const { user, actors: actorsNamesArr, ...restMovieData } = movieData;
+
+  const titleExists = await isTitleExists(restMovieData.title, user.id);
+
+  if (titleExists && throwExistsError) throw new AppError(errorMsg.FAILED_MOVIE_EXISTS);
+
+  if (titleExists) return;
 
   const newMovie = await universalRepository.createOne('Movie', restMovieData);
   const [actors] = await Promise.all([addActorsHelper(actorsNamesArr, newMovie.id), user.addMovie(newMovie)]);
@@ -135,16 +153,31 @@ exports.loadFromFile = async (file, user) => {
   const moviesPromise = moviesData.map((movieData) => {
     const { actors, ...restMovieData } = movieData;
 
-    return createMovie({ user, actors, ...restMovieData }, true);
+    return createMovie({ user, actors, ...restMovieData }, true, false);
   });
 
   const data = await Promise.all(moviesPromise);
   const total = await universalRepository.count('Movie', { where: { userId: user.id } });
 
+  const movies = [];
+  let skipped = 0;
+
+  data.forEach((item) => {
+    if (item) {
+      movies.push(item);
+
+      return;
+    }
+
+    skipped++;
+  });
+
   const meta = {
     total,
-    imported: data.length
+    imported: movies.length
   };
 
-  return { data, meta };
+  if (skipped) meta.skipped = skipped;
+
+  return { data: movies, meta };
 };

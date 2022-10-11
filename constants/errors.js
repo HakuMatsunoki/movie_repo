@@ -12,6 +12,8 @@ module.exports = {
     msg: 'User must have a password min 8 characters long, contains capital letters, numbers and special characters..'
   },
 
+  FAILED_MOVIE_EXISTS: { code: 409, msg: 'Movie with the same title already exists' },
+
   FILE_TOO_LARGE: { code: 500, msg: 'File too large, try another one..' },
   INTERNAL: { code: 500, msg: 'Something went wrong. Try again later..' },
 

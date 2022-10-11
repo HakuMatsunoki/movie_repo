@@ -89,9 +89,9 @@ exports.deleteMovie = catchAsync(async (req, res) => {
  * @param {Function} RequestHandler
  */
 exports.uploadTxt = catchAsync(async (req, res) => {
-  const { file } = req.files;
+  const { movies } = req.files;
 
-  const { data, meta } = await movieService.loadFromFile(file, req.user);
+  const { data, meta } = await movieService.loadFromFile(movies, req.user);
 
   res.status(200).json({
     status: OK,
